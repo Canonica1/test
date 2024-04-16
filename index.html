@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BabylonJS</title>
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=no">
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <style>
+        html, body {
+            overflow: hidden;
+            width   : 100%;
+            height  : 100%;
+            margin  : 0;
+            padding : 0;
+        }
+
+        #gameCanvas {
+            width   : 100%;
+            height  : 100%;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        window.addEventListener('DOMContentLoaded', function(){
+            // получим DOM-элемент canvas
+            var canvas = document.getElementById('gameCanvas');
+
+            // загрузим 3D-движок
+            var engine = new BABYLON.Engine(canvas, true);
+
+            // createScene – функция, которая создаёт и возвращает сцену
+            var createScene = function(){
+
+                // создаём стандартный объект Scene
+                var scene = new BABYLON.Scene(engine);
+
+                // создаём камеру типа FreeCamera, и устанавливаем её позицию как (x:0, y:5, z:-10)
+                var camera = new BABYLON.FreeCamera('camera1', new BABYLON.Vector3(0, 5,-10), scene);
+
+                // наводим камеру на начало координат сцены
+                camera.setTarget(BABYLON.Vector3.Zero());
+
+                // создаём простой источник света, направляем его в позицию 0,1,0 – то есть – вверх, на «небо»
+                var light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,1,0), scene);
+
+                // создаём стандартный трёхмерный объект — куб
+                var box = new BABYLON.Mesh.CreateBox('box1', 2.0, scene);
+                
+                // добавляем текстуру, которую будем накладывать на куб
+                var texture = new BABYLON.StandardMaterial("texture1", scene);
+                texture.bumpTexture = new BABYLON.Texture("asset/babylonjs.png", scene);
+                box.material = texture;
+                
+                // задаём параметры перемещения куба. Он будет вращаться.
+                var animationX = new BABYLON.Animation.CreateAndStartAnimation('boxrotate', box, 'rotation.x', 60, 360, 1, 10);
+                var animationY = new BABYLON.Animation.CreateAndStartAnimation('boxrotate', box, 'rotation.y', 60, 360, 1, 10);   
+
+                // возвращаем созданную сцену
+                return scene;
+            }
+
+            // вызываем функцию createScene 
+            var scene = createScene();
+
+            // запускаем цикл рендеринга
+            engine.runRenderLoop(function(){
+                scene.render();
+            });
+
+            // обработчик событий изменения размера элемента canvas или окна
+            window.addEventListener('resize', function(){
+                engine.resize();
+            });
+        });
+    </script>
+</body>
+</html>
